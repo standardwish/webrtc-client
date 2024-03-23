@@ -40,15 +40,14 @@ function App() {
       setMessages([]);
     }
   }, [isConnected]);
-  console.log(socket.disconnected);
 
   return (
     <div className="App">
-      <div className="h-[calc(100vh_-_60px)] flex flex-col justify-end items-end gap-5 px-11 relative pb-10">
+      <div className="h-[calc(100vh)] flex flex-col justify-end items-end gap-5 md:px-11 px-4 relative pb-4">
         <div className="w-full">
           <ul className="items-start">
-            {messages.map((msg) => (
-              <li>
+            {messages.map((msg, idx) => (
+              <li key={idx}>
                 {msg.userName}: {msg.message}
               </li>
             ))}

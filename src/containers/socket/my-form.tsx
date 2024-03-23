@@ -28,6 +28,7 @@ export function MyForm() {
       message: message,
     });
     setIsLoading(false);
+    onReset();
   }
 
   return (
