@@ -1,21 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
-import { Button } from "./components/ui/button";
+import { MyForm } from "./containers/socket/my-form";
+import { socket } from "./lib/socket";
+import { SocketData } from "./types/socket";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [messages, setMessages] = useState<SocketData[]>([]);
+
+  useEffect(() => {
+    function onConnect() {
+      setIsConnected(true);
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+    }
+
+    function onMsgReponse({ userName, userId, message }: SocketData) {
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        { userName, userId, message },
+      ]);
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("msg-response", onMsgReponse);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("msg-response", onMsgReponse);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      setMessages([]);
+    }
+  }, [isConnected]);
+  console.log(socket.disconnected);
 
   return (
-    <div className="h-screen w-screen flex flex-col gap-4 justify-center items-center">
-      <h1 className="text-3xl">React-TailwindCSS-Typescript-Vite-shadcn/ui</h1>
-      <h1 className="text-5xl font-bold">{count}</h1>
-      <div className="flex flex-row gap-5">
-        <Button size={"icon"} onClick={() => setCount((count) => count + 1)}>
-          +
-        </Button>
-        <Button size={"icon"} onClick={() => setCount((count) => count - 1)}>
-          -
-        </Button>
+    <div className="App">
+      <div className="h-[calc(100vh_-_60px)] flex flex-col justify-end items-end gap-5 px-11 relative pb-10">
+        <div className="w-full">
+          <ul className="items-start">
+            {messages.map((msg) => (
+              <li>
+                {msg.userName}: {msg.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <MyForm />
       </div>
     </div>
   );
