@@ -59,7 +59,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       transitionProperty: {
-        height: "height",
+        nav: "max-height, opacity",
         spacing: "margin, padding",
       },
       keyframes: {

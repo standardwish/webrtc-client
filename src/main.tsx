@@ -4,10 +4,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
-import { NavigationBar } from "./components/navigation-bar.tsx";
 import ProfileProvider from "./context/provider.tsx";
 import "./index.css";
 import Docs from "./routes/docs/page.tsx";
+import Room from "./routes/room/page.tsx";
+import Root from "./routes/root.tsx";
 
 const client_key = import.meta.env.VITE_APP_GOOGLE_OAUTH_CLIENT_KEY;
 const queryClient = new QueryClient({
@@ -22,11 +23,21 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
-  },
-  {
-    path: "/docs",
-    element: <Docs />,
+    element: <Root />,
+    children: [
+      {
+        path: "/", // yes, again
+        element: <App />,
+      },
+      {
+        path: "/docs",
+        element: <Docs />,
+      },
+      {
+        path: "/room/:roomId",
+        element: <Room />,
+      },
+    ],
   },
 ]);
 
@@ -35,7 +46,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ProfileProvider>
       <GoogleOAuthProvider clientId={client_key!}>
         <QueryClientProvider client={queryClient}>
-          <NavigationBar />
           <RouterProvider router={router} />
         </QueryClientProvider>
       </GoogleOAuthProvider>

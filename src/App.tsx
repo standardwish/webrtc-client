@@ -17,7 +17,7 @@ function App() {
       setIsConnected(false);
     }
 
-    function onMsgReponse({ userName, userId, message }: SocketData) {
+    function onMsgResponse({ userName, userId, message }: SocketData) {
       setMessages((currentMessages) => [
         ...currentMessages,
         { userName, userId, message },
@@ -26,12 +26,12 @@ function App() {
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-    socket.on("msg-response", onMsgReponse);
+    socket.on("msg-response", onMsgResponse);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
-      socket.off("msg-response", onMsgReponse);
+      socket.off("msg-response", onMsgResponse);
     };
   }, []);
 
@@ -43,7 +43,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className="h-[calc(100vh)] flex flex-col justify-end items-end gap-5 md:px-11 px-4 relative pb-4">
+      <div className="h-screen flex flex-col justify-end items-end gap-5 relative pb-8">
         <div className="w-full">
           <ul className="items-start">
             {messages.map((msg, idx) => (

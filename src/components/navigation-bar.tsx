@@ -1,73 +1,53 @@
-import { socket } from "@/lib/socket";
-import {
-  TokenResponse,
-  googleLogout,
-  useGoogleLogin,
-} from "@react-oauth/google";
-import { AnimatePresence, motion, useCycle } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Logo from "./icon/logo";
 import { MenuToggle } from "./ui/menu-toggle";
 
-export function NavigationBar() {
+const locations = [
+  {
+    name: "React",
+    to: "a0fmhkcc8e",
+  },
+  {
+    name: "Angular",
+    to: "bzdb1j45x19",
+  },
+  {
+    name: "Vue",
+    to: "85wv0xdhgk4",
+  },
+];
+export function NavBar() {
   //Is NavigationBar Open
-  const [isOpen, toggleOpen] = useCycle(false, true);
-  //Profile Data
-  const [tokenResponse, setTokenResponse] = useState<TokenResponse>();
-
-  //Login
-  const login = useGoogleLogin({
-    onSuccess: (tokenResponse) => setTokenResponse(tokenResponse),
-    onError: (error) => console.error(error),
-  });
-  //Lgout
-  const logout = () => {
-    googleLogout();
-    setTokenResponse(undefined);
-  };
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    if (tokenResponse) {
-      socket.connect();
-    } else {
-      socket.disconnect();
-    }
-  }, [tokenResponse]);
+    // Close the navbar when navigating to a different page
+    setIsOpen(false);
+  }, [location]);
 
   return (
-    <header
-      className={`w-full transition-height bg-primary md:px-11 py-4 fixed z-50`}
-      style={
-        isOpen
-          ? { height: "auto", paddingBottom: "1rem" }
-          : { height: "60px", paddingBottom: "0" }
-      }
-    >
-      <motion.nav
-        initial={false}
-        animate={isOpen ? "open" : "closed"}
-        className="flex flex-col w-full"
-      >
+    <header className={`w-full bg-primary md:px-11 py-4 fixed z-50 h-auto`}>
+      <nav className="flex flex-col w-full">
         <div className="flex items-center justify-between w-full px-4">
-          <Logo />
-          <MenuToggle toggle={toggleOpen} />
+          <Link to={"/"}>
+            <Logo />
+          </Link>
+          <MenuToggle toggle={() => setIsOpen(!isOpen)} isOpen={isOpen} />
         </div>
-        <AnimatePresence>
-          {isOpen && (
-            <motion.ul
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col gap-3"
-            >
-              <NavTab href="/">Item 1</NavTab>
-              <NavTab href="/">Item 2</NavTab>
-              <NavTab href="/">Item 3</NavTab>
-            </motion.ul>
-          )}
-        </AnimatePresence>
-      </motion.nav>
+        <ul
+          className={`flex flex-col gap-3 overflow-hidden transition-nav duration-500 ${
+            isOpen ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          {locations.map((val) => (
+            <NavTab key={val.to} href={`/room/${val.to}`}>
+              {val.name}
+            </NavTab>
+          ))}
+        </ul>
+      </nav>
     </header>
   );
 }
@@ -80,11 +60,11 @@ function NavTab({
   children: React.ReactNode;
 }) {
   return (
-    <a
-      href={href}
-      className="px-4 py-2 text-sm font-medium text-gray-50 rounded-md"
+    <Link
+      to={href}
+      className="px-4 py-2 text-lg font-medium text-gray-50 rounded-md"
     >
       {children}
-    </a>
+    </Link>
   );
 }
